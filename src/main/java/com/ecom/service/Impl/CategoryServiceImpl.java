@@ -1,9 +1,12 @@
 package com.ecom.service.Impl;
+
 import com.ecom.model.Category;
 import com.ecom.repository.CategoryRepo;
 import com.ecom.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
 import java.util.List;
 
 @Service
@@ -18,12 +21,28 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean existCategory(String name) {
+    public Boolean existCategory(String name) {
         return categoryRepo.existsByName(name);
     }
 
     @Override
     public List<Category> getAllCategory() {
         return categoryRepo.findAll();
+    }
+
+    @Override
+    public Boolean deleteCategory(int id) {
+        Category category = categoryRepo.findById(id).orElse(null);
+        if (!ObjectUtils.isEmpty(category)) {
+            categoryRepo.delete(category);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Category getCategoryById(int id) {
+        Category category = categoryRepo.findById(id).orElse(null);
+        return category;
     }
 }

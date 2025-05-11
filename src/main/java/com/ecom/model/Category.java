@@ -16,5 +16,5 @@ public class Category {
     private int id;
     private String name;
     private String imageName;
-    private boolean isActive;
+    private Boolean isActive;
 }
