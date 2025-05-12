@@ -1,7 +1,9 @@
 package com.ecom.controller;
 
 import com.ecom.model.Category;
+import com.ecom.model.Product;
 import com.ecom.service.CategoryService;
+import com.ecom.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 
 @Controller
@@ -25,13 +28,18 @@ public class AdminController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private ProductService productService;
+
     @GetMapping("/")
     public String index() {
         return "admin/index";
     }
 
     @GetMapping("/loadAddProduct")
-    public String loadAddProduct() {
+    public String loadAddProduct(Model model) {
+        List<Category> categories = categoryService.getAllCategory();
+        model.addAttribute("categories", categories);
         return "admin/addProduct";
     }
 
@@ -41,24 +49,6 @@ public class AdminController {
         return "admin/category";
     }
 
-//    @PostMapping("/saveCategory")
-//    public String saveCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file, HttpSession session){
-//        String imageName = file != null ? file.getOriginalFilename(): "default.jpg";
-//        category.setImageName(imageName);
-//
-//        boolean existCategory = categoryService.existCategory(category.getName());
-//        if(existCategory){
-//            session.setAttribute("errorMsg","Category name already exists");
-//        }else{
-//            Category saveCategory = categoryService.saveCategory(category);
-//            if(ObjectUtils.isEmpty(saveCategory)){
-//                session.setAttribute("errorMsg","Not saved! internal server error");
-//            }else {
-//                session.setAttribute("succMsg","Saved successfully");
-//            }
-//        }
-//        return "redirect:/admin/category";
-//    }
 
     @PostMapping("/saveCategory")
     public String saveCategory(@ModelAttribute Category category,
@@ -131,6 +121,30 @@ public class AdminController {
             session.setAttribute("errorMsg", "Something Wrong! Try again.");
         }
         return "redirect:/admin/loadEditCategory/" + category.getId();
+    }
+
+
+    @PostMapping("/saveProduct")
+    public String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
+                              HttpSession session) throws IOException {
+        String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
+        product.setImageName(imageName);
+
+        productService.saveProduct(product);
+
+
+        if (!ObjectUtils.isEmpty(product)) {
+            File saveFile = new ClassPathResource("/static/img").getFile();
+            Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator + image.getOriginalFilename());
+
+            System.out.println(path);
+            Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+            session.setAttribute("succMsg", "Product saved Successfully");
+        } else {
+            session.setAttribute("errorMsg", "Something Wrong! Try again.");
+        }
+        return "redirect:/admin/loadAddProduct";
     }
 
 }
