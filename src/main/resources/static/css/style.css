@@ -11,3 +11,20 @@
 .error {
 	color: red;
 }
+
+.footer {
+  height: 60px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  line-height: 60px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}

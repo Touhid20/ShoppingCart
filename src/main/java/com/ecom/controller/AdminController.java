@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -145,6 +144,52 @@ public class AdminController {
             session.setAttribute("errorMsg", "Something Wrong! Try again.");
         }
         return "redirect:/admin/loadAddProduct";
+    }
+
+//    @PostMapping("/saveProduct")
+//    public String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
+//                              HttpSession session) throws IOException {
+//        String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
+//        product.setImageName(imageName);
+//
+//        productService.saveProduct(product);
+//
+//        if (!ObjectUtils.isEmpty(product)) {
+//            // ✅ Path to src/main/resources/static/img/product_img
+//            String projectPath = System.getProperty("user.dir"); // D:\Self Development\shoppingCart
+//            String staticImagePath = projectPath + "/src/main/resources/static/img/product_img";
+//
+//            File dir = new File(staticImagePath);
+//            if (!dir.exists()) dir.mkdirs(); // ফোল্ডার না থাকলে তৈরি করবে
+//
+//            Path path = Paths.get(staticImagePath + File.separator + image.getOriginalFilename());
+//            System.out.println("Saving to: " + path);
+//
+//            Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+//
+//            session.setAttribute("succMsg", "Product saved Successfully");
+//        } else {
+//            session.setAttribute("errorMsg", "Something Wrong! Try again.");
+//        }
+//
+//        return "redirect:/admin/loadAddProduct";
+//    }
+
+
+    @GetMapping("/products")
+    public String loadViewProduct(Model model){
+        model.addAttribute("products",productService.getAllProducts());
+        return "/admin/products";
+    }
+@GetMapping("/deleteProduct/{id}")
+    public String deleteProduct(@PathVariable int id, HttpSession session){
+       Boolean deleteProduct = productService.deleteProduct(id);
+        if(deleteProduct){
+            session.setAttribute("succMsg","Product delete Successfully");
+        }else {
+            session.setAttribute("errorMsg","Something Wrong! Try again.");
+        }
+        return "redirect:/admin/products";
     }
 
 }
