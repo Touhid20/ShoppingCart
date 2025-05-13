@@ -32,9 +32,9 @@
                             <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
                                 Categories
                             </a>
-                            <a href="#" class="list-group-item list-group-item-action">Electronics</a>
-                            <a href="#" class="list-group-item list-group-item-action">Mobile</a>
-                            <a href="#" class="list-group-item list-group-item-action">Clothes</a>
+                            <a href="#" th:each="c : ${categories}"
+                               class="list-group-item list-group-item-action">[[${c.name}]]</a>
+
                         </div>
                     </div>
                 </div>
@@ -46,75 +46,28 @@
                     <div class="card-body">
                         <p class="fs-3 text-center">Products</p>
                         <div class="row">
-                            <div class="col-md-3">
-                                <div class="card">
+                            <div class="col-md-3" th:each="p:${products}">
+                                <div class="card card-sh">
                                     <div class="card-body text-center">
-                                        <img src="img/product_img/laptop.jpg" alt="" width="100%" height="150px">
-                                        <p class="fs-5 text-center">Laptop</p>
+                                        <img th:src="@{'img/product_img/'+${p.imageName}}" alt="" width="75%" height="150px">
+                                        <p class="fs-5 text-center">[[${p.title}]]</p>
                                         <div class="row text-center">
-                                            <p class="fs-6 fw-bold"><i class="fa-solid fa-dollar-sign"></i> 500
-                                                <span class="fs-6 text-success">20% off</span>
+                                            <p class="fs-6 fw-bold">
+                                                <span>&#2547; [[${p.discountPrice}]]</span><br>
+                                                <span class="text-decoration-line-through text-secondary">&#2547; [[${p.price}]]</span>
+                                                <span class="fs-6 text-success">[[${p.discount}]]% off</span>
                                             </p>
-                                            <a href="/product" class="btn btn-primary col-md-6 offset-md-3" style="font-size:12px">View
-                                                Details</a>
+                                            <a href="/product" class="btn btn-primary col-md-6 offset-md-3"
+                                               style="font-size:12px">View Details</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!--  ToDo: Remove after Backend implement-->
-                            <div class="col-md-3">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <img src="img/product_img/laptop.jpg" alt="" width="100%" height="150px">
-                                        <p class="fs-5 text-center">Laptop</p>
-                                        <div class="row text-center">
-                                            <p class="fs-6 fw-bold"><i class="fa-solid fa-dollar-sign"></i> 500
-                                                <span class="fs-6 text-success">20% off</span>
-                                            </p>
-                                            <a class="btn btn-primary col-md-6 offset-md-3" style="font-size:12px">View
-                                                Details</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <img src="img/product_img/laptop.jpg" alt="" width="100%" height="150px">
-                                        <p class="fs-5 text-center">Laptop</p>
-                                        <div class="row text-center">
-                                            <p class="fs-6 fw-bold"><i class="fa-solid fa-dollar-sign"></i> 500
-                                                <span class="fs-6 text-success">20% off</span>
-                                            </p>
-                                            <a class="btn btn-primary col-md-6 offset-md-3" style="font-size:12px">View
-                                                Details</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <img src="img/product_img/laptop.jpg" alt="" width="100%" height="150px">
-                                        <p class="fs-5 text-center">Laptop</p>
-                                        <div class="row text-center">
-                                            <p class="fs-6 fw-bold"><i class="fa-solid fa-dollar-sign"></i> 500
-                                                <span class="fs-6 text-success">20% off</span>
-                                            </p>
-                                            <a class="btn btn-primary col-md-6 offset-md-3" style="font-size:12px">View
-                                                Details</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- End   -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
 </section>
 
