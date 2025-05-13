@@ -29,4 +29,7 @@ public class Product {
     private int stock;
 
     private String imageName;
+
+    private int discount;
+    private Double discountPrice;
 }
