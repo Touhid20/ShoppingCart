@@ -26,7 +26,10 @@ public class UserDtls {
     private String state;
     private String pinCode;
     private String password;
-    private String confirmPassword;
+
     private String profileImage;
+
+    private String role;
+
 
 }

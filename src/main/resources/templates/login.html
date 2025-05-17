@@ -17,7 +17,13 @@
                     <div class="card-header">
                         <p class="fs-4 text-center">Login</p>
                         <div class="card-body">
-                            <form>
+                            <form action="/login" method="post">
+                                <div th:if="${param.error}" class="alert alert-danger">
+                                    Invalid email & password
+                                </div>
+                                <div th:if="${param.logout}" class="alert alert-success">
+                                    Logout Successfully
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label">Email</label>
                                     <input class="form-control" name="username" type="email">
