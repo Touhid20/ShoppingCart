@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -36,6 +37,18 @@ public class HomeController {
 
     @Autowired
     private UserService userService;
+
+    @ModelAttribute
+    public void getUserDetails(Principal principal, Model model) {
+        if ((principal != null)) {
+            String email = principal.getName();
+            UserDtls userDtls = userService.getUserByEmail(email);
+            model.addAttribute("user",userDtls);
+        }
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+        model.addAttribute("categories",allActiveCategory);
+
+    }
 
     @GetMapping("/")
     public String index() {
@@ -95,5 +108,6 @@ public class HomeController {
 
         return "redirect:/registration";
     }
+
 
 }

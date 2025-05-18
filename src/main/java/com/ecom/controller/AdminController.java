@@ -2,8 +2,10 @@ package com.ecom.controller;
 
 import com.ecom.model.Category;
 import com.ecom.model.Product;
+import com.ecom.model.UserDtls;
 import com.ecom.service.CategoryService;
 import com.ecom.service.ProductService;
+import com.ecom.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -19,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 
@@ -30,6 +33,21 @@ public class AdminController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private UserService userService;
+
+    @ModelAttribute
+    public void getUserDetails(Principal principal, Model model) {
+        if ((principal != null)) {
+            String email = principal.getName();
+            UserDtls userDtls = userService.getUserByEmail(email);
+            model.addAttribute("user", userDtls);
+        }
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+        model.addAttribute("categories", allActiveCategory);
+
+    }
 
     @GetMapping("/")
     public String index() {
@@ -213,11 +231,29 @@ public class AdminController {
             if (!ObjectUtils.isEmpty(updateProduct)) {
                 session.setAttribute("succMsg", "Product update Successfully");
             } else {
-                session.setAttribute("errorMsg", "Something Wrong! Try again.");
+                session.setAttribute("errorMsg", "Something Wrong! Try again");
             }
         }
         return "redirect:/admin/editProduct/" + product.getId();
 
+    }
+
+    @GetMapping("/users")
+    public String getAllUsers(Model model) {
+        List<UserDtls> users = userService.getAllUsers("ROLE_USER");
+        model.addAttribute("users", users);
+        return "/admin/users";
+    }
+
+    @GetMapping("/updateStatus")
+    public String updateUserAccountStatus(@RequestParam Boolean status, @RequestParam Integer id, HttpSession session) {
+        Boolean f = userService.updateAccountStatus(id, status);
+        if(f){
+            session.setAttribute("succMsg","Account status updated");
+        }else {
+            session.setAttribute("errorMsg","Something Wrong! Try again");
+        }
+        return "redirect:/admin/users";
     }
 
 }

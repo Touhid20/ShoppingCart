@@ -18,8 +18,8 @@
                         <p class="fs-4 text-center">Login</p>
                         <div class="card-body">
                             <form action="/login" method="post">
-                                <div th:if="${param.error}" class="alert alert-danger">
-                                    Invalid email & password
+                                <div th:if="${param.error}" class="alert alert-danger text-center">
+                                    [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
                                 </div>
                                 <div th:if="${param.logout}" class="alert alert-success">
                                     Logout Successfully
