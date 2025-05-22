@@ -6,6 +6,7 @@ import com.ecom.model.UserDtls;
 import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
 import com.ecom.service.UserService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,7 @@ public class UserController {
     private CategoryService categoryService;
 
     @GetMapping("/home")
-    public String home(){
+    public String home() {
         return "/user/home";
     }
 
@@ -42,21 +43,50 @@ public class UserController {
         if ((principal != null)) {
             String email = principal.getName();
             UserDtls userDtls = userService.getUserByEmail(email);
-            model.addAttribute("user",userDtls);
+            model.addAttribute("user", userDtls);
+            Integer countCart = cartService.getCountCart(userDtls.getId());
+            model.addAttribute("countCart", countCart);
         }
         List<Category> allActiveCategory = categoryService.getAllActiveCategory();
-        model.addAttribute("categories",allActiveCategory);
+        model.addAttribute("categories", allActiveCategory);
 
     }
+
     @GetMapping("/addCart")
-    public String addToCart(@RequestParam Integer pid, @RequestParam Integer uid, HttpSession session){
+    public String addToCart(@RequestParam Integer pid, @RequestParam Integer uid, HttpSession session) {
         Cart saveCart = cartService.saveCart(pid, uid);
 
-        if(ObjectUtils.isEmpty(saveCart)){
-            session.setAttribute("errorMsg","Product add to cart Failed!!");
-        }else {
-            session.setAttribute("succMsg","Product added to cart");
+        if (ObjectUtils.isEmpty(saveCart)) {
+            session.setAttribute("errorMsg", "Product add to cart Failed!!");
+        } else {
+            session.setAttribute("succMsg", "Product added to cart");
         }
         return "redirect:/product/" + pid;
     }
+
+    @GetMapping("/cart")
+    private String loadCartPage(Principal principal, Model model) {
+        UserDtls user = getLoggedInUserDetails(principal);
+        List<Cart> carts = cartService.getCartsByUser(user.getId());
+        model.addAttribute("carts", carts);
+        if(carts.size() > 0) {
+            double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            model.addAttribute("totalOrderPrice", totalOrderPrice);
+        }
+        return "/user/cart";
+    }
+
+    private UserDtls getLoggedInUserDetails(Principal principal) {
+        String email = principal.getName();
+        UserDtls userDtls = userService.getUserByEmail(email);
+        return userDtls;
+    }
+
+    @GetMapping("/cartQuantityUpdate")
+    public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
+        cartService.updateCartQuantity(sy, cid);
+        return "redirect:/user/cart";
+    }
+
+
 }

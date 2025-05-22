@@ -3,6 +3,7 @@ package com.ecom.controller;
 import com.ecom.model.Category;
 import com.ecom.model.Product;
 import com.ecom.model.UserDtls;
+import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
 import com.ecom.service.ProductService;
 import com.ecom.service.UserService;
@@ -36,6 +37,8 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private CartService cartService;
 
     @ModelAttribute
     public void getUserDetails(Principal principal, Model model) {
@@ -43,6 +46,9 @@ public class AdminController {
             String email = principal.getName();
             UserDtls userDtls = userService.getUserByEmail(email);
             model.addAttribute("user", userDtls);
+            Integer countCart = cartService.getCountCart(userDtls.getId());
+            model.addAttribute("countCart",countCart);
+
         }
         List<Category> allActiveCategory = categoryService.getAllActiveCategory();
         model.addAttribute("categories", allActiveCategory);

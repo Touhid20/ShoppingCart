@@ -1,6 +1,7 @@
 package com.ecom.service.Impl;
 
 import com.ecom.model.Cart;
+import com.ecom.model.Category;
 import com.ecom.model.Product;
 import com.ecom.model.UserDtls;
 import com.ecom.repository.CartRepo;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,16 +32,16 @@ public class CartServiceImpl implements CartService {
         Cart cartStatus = cartRepo.findByProductIdAndUserId(productId, userId);
 
         Cart cart = null;
-        if(ObjectUtils.isEmpty(cartStatus)){
+        if (ObjectUtils.isEmpty(cartStatus)) {
             cart = new Cart();
             cart.setProduct(product);
             cart.setUser(userDtls);
             cart.setQuantity(1);
-            cart.setTotalPrice(1*product.getDiscountPrice());
-        }else {
+            cart.setTotalPrice(1 * product.getDiscountPrice());
+        } else {
             cart = cartStatus;
-            cart.setQuantity(cart.getQuantity()+1);
-            cart.setTotalPrice(cart.getQuantity()*cart.getProduct().getDiscountPrice());
+            cart.setQuantity(cart.getQuantity() + 1);
+            cart.setTotalPrice(cart.getQuantity() * cart.getProduct().getDiscountPrice());
         }
         Cart saveCart = cartRepo.save(cart);
 
@@ -49,6 +51,44 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<Cart> getCartsByUser(Integer userId) {
-        return List.of();
+        List<Cart> carts = cartRepo.findByUserId(userId);
+
+        Double totalOrderPrice = 0.0;
+        List<Cart> updateCarts = new ArrayList<>();
+        for (Cart c : carts) {
+            Double totalPrice = (c.getProduct().getDiscountPrice() * c.getQuantity());
+            c.setTotalPrice(totalPrice);
+
+            totalOrderPrice = totalOrderPrice + totalPrice;
+            c.setTotalOrderPrice(totalOrderPrice);
+            updateCarts.add(c);
+        }
+        return updateCarts;
+    }
+
+    @Override
+    public Integer getCountCart(Integer userId) {
+        Integer countByUserId = cartRepo.countByUserId(userId);
+        return countByUserId;
+    }
+
+    @Override
+    public void updateCartQuantity(String sy, Integer cid) {
+        Cart cart = cartRepo.findById(cid).get();
+        int updateQuantity;
+
+        if (sy.equalsIgnoreCase("de")) {
+            updateQuantity = cart.getQuantity() - 1;
+            if (updateQuantity <= 0) {
+                cartRepo.deleteById(cid);
+            } else {
+                cart.setQuantity(updateQuantity);
+                cartRepo.save(cart);
+            }
+        } else {
+            updateQuantity = cart.getQuantity() + 1;
+            cart.setQuantity(updateQuantity);
+            cartRepo.save(cart);
+        }
     }
 }
