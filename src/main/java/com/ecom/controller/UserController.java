@@ -2,20 +2,18 @@ package com.ecom.controller;
 
 import com.ecom.model.Cart;
 import com.ecom.model.Category;
+import com.ecom.model.OrderRequest;
 import com.ecom.model.UserDtls;
 import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
+import com.ecom.service.OrderService;
 import com.ecom.service.UserService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -32,6 +30,9 @@ public class UserController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/home")
     public String home() {
@@ -86,6 +87,19 @@ public class UserController {
     public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
         cartService.updateCartQuantity(sy, cid);
         return "redirect:/user/cart";
+    }
+
+    @GetMapping("/orders")
+    public String cardPage(){
+        return "/user/order";
+    }
+
+    @PostMapping("/saveOrders")
+    public String saveOrders(@ModelAttribute OrderRequest request,Principal principal){
+//        System.out.println(request);
+        UserDtls user = getLoggedInUserDetails(principal);
+        orderService.saveProduct(user.getId(),request);
+        return "/user/success";
     }
 
 
