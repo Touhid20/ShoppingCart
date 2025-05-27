@@ -2,11 +2,10 @@ package com.ecom.controller;
 
 import com.ecom.model.Category;
 import com.ecom.model.Product;
+import com.ecom.model.ProductOrder;
 import com.ecom.model.UserDtls;
-import com.ecom.service.CartService;
-import com.ecom.service.CategoryService;
-import com.ecom.service.ProductService;
-import com.ecom.service.UserService;
+import com.ecom.service.*;
+import com.ecom.util.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -29,6 +28,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
     @Autowired
     private CategoryService categoryService;
 
@@ -37,8 +37,12 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
 
     @ModelAttribute
     public void getUserDetails(Principal principal, Model model) {
@@ -262,4 +266,30 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    @GetMapping("/orders")
+    public String getAllOrders(Model model) {
+        List<ProductOrder> orders = orderService.getAllOrders();
+        model.addAttribute("orders",orders);
+        return "/admin/orders";
+    }
+
+    @PostMapping("/updateOrderStatus")
+    public String updateStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+
+        OrderStatus[] values = OrderStatus.values();
+        String status = null;
+        System.out.println("Values: " + values);
+        for (OrderStatus orderStatus : values) {
+            if (orderStatus.getId().equals(st)) {
+                status = orderStatus.getName();
+            }
+        }
+        Boolean updateOrder = orderService.updateStatus(id, status);
+        if (updateOrder) {
+            session.setAttribute("succMsg", "Status updated successfully");
+        } else {
+            session.setAttribute("errorMsg", "Status not updated");
+        }
+        return "redirect:/admin/orders";
+    }
 }

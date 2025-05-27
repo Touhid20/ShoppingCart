@@ -11,9 +11,8 @@ import com.ecom.util.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -31,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
             ProductOrder order = new ProductOrder();
 
             order.setOrderId(UUID.randomUUID().toString());
-            order.setOrederDate(new Date());
+            order.setOrderDate(LocalDate.now());
 
             order.setProduct(cart.getProduct());
             order.setPrice(cart.getProduct().getDiscountPrice());
@@ -60,5 +59,28 @@ public class OrderServiceImpl implements OrderService {
 
         }
 
+    }
+
+    @Override
+    public List<ProductOrder> getOrdersByUser(Integer userId) {
+        List<ProductOrder> orders = productOrderRepo.findByUserId(userId);
+        return orders;
+    }
+
+    @Override
+    public Boolean updateStatus(Integer id, String status) {
+        Optional<ProductOrder> findById = productOrderRepo.findById(id);
+        if(findById.isPresent()){
+            ProductOrder productOrder = findById.get();
+            productOrder.setStatus(status);
+            productOrderRepo.save(productOrder);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<ProductOrder> getAllOrders() {
+        return productOrderRepo.findAll();
     }
 }

@@ -2,10 +2,11 @@ package com.ecom.util;
 
 public enum OrderStatus {
     IN_PROGRESS(1,"In Progress"),
-    ORDER_RECIEVED(2,"Order Recieved"),
+    ORDER_RECEIVED(2,"Order Received"),
     PRODUCT_PACKED(3,"Product Packed"),
-    OUT_FOR_DELIVERY(4,"Out for Delivary"),
-    DELIVERED(5,"Delivered");
+    OUT_FOR_DELIVERY(4,"Out for Delivery"),
+    DELIVERED(5,"Delivered"),
+    CANCEL(6,"Canceled");
 
     private Integer id;
     private String name;
