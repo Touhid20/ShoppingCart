@@ -7,10 +7,13 @@ import com.ecom.model.ProductOrder;
 import com.ecom.repository.CartRepo;
 import com.ecom.repository.ProductOrderRepo;
 import com.ecom.service.OrderService;
+import com.ecom.util.CommonUtil;
 import com.ecom.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -23,8 +26,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartRepo cartRepo;
 
+    @Autowired
+    CommonUtil commonUtil;
+
     @Override
-    public void saveProduct(Integer userId, OrderRequest orderRequest) {
+    public void saveOrder(Integer userId, OrderRequest orderRequest) throws Exception {
         List<Cart> carts = cartRepo.findByUserId(userId);
         for (Cart cart : carts){
             ProductOrder order = new ProductOrder();
@@ -53,7 +59,8 @@ public class OrderServiceImpl implements OrderService {
 
             order.setOrderAddress(address);
 
-            productOrderRepo.save(order);
+            ProductOrder saveOrder = productOrderRepo.save(order);
+            commonUtil.sendMailForProductOrder(saveOrder,"success");
 
 
 
@@ -68,15 +75,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean updateStatus(Integer id, String status) {
+    public ProductOrder updateStatus(Integer id, String status) {
         Optional<ProductOrder> findById = productOrderRepo.findById(id);
         if(findById.isPresent()){
             ProductOrder productOrder = findById.get();
             productOrder.setStatus(status);
-            productOrderRepo.save(productOrder);
-            return true;
+            ProductOrder updateOrder = productOrderRepo.save(productOrder);
+            return updateOrder;
         }
-        return false;
+        return null;
     }
 
     @Override

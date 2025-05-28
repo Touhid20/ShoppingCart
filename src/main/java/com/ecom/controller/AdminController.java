@@ -5,7 +5,9 @@ import com.ecom.model.Product;
 import com.ecom.model.ProductOrder;
 import com.ecom.model.UserDtls;
 import com.ecom.service.*;
+import com.ecom.util.CommonUtil;
 import com.ecom.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +46,10 @@ public class AdminController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private CommonUtil commonUtil;
+
 
     @ModelAttribute
     public void getUserDetails(Principal principal, Model model) {
@@ -284,8 +291,14 @@ public class AdminController {
                 status = orderStatus.getName();
             }
         }
-        Boolean updateOrder = orderService.updateStatus(id, status);
-        if (updateOrder) {
+        ProductOrder updateOrder = orderService.updateStatus(id, status);
+
+        try {
+            commonUtil.sendMailForProductOrder(updateOrder,status);
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+        if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("succMsg", "Status updated successfully");
         } else {
             session.setAttribute("errorMsg", "Status not updated");

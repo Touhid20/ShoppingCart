@@ -5,7 +5,9 @@ import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
 import com.ecom.service.OrderService;
 import com.ecom.service.UserService;
+import com.ecom.util.CommonUtil;
 import com.ecom.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.List;
 
@@ -28,6 +31,9 @@ public class UserController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @Autowired
     private OrderService orderService;
@@ -102,10 +108,10 @@ public class UserController {
     }
 
     @PostMapping("/saveOrders")
-    public String saveOrders(@ModelAttribute OrderRequest request, Principal principal) {
+    public String saveOrders(@ModelAttribute OrderRequest request, Principal principal) throws Exception {
 //        System.out.println(request);
         UserDtls user = getLoggedInUserDetails(principal);
-        orderService.saveProduct(user.getId(), request);
+        orderService.saveOrder(user.getId(), request);
         return "redirect:/user/success";
     }
 
@@ -134,8 +140,15 @@ public class UserController {
                 status = orderStatus.getName();
             }
         }
-        Boolean updateOrder = orderService.updateStatus(id, status);
-        if (updateOrder) {
+
+        ProductOrder updateOrder = orderService.updateStatus(id, status);
+        try {
+            commonUtil.sendMailForProductOrder(updateOrder, status);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("succMsg", "Status updated successfully");
         } else {
             session.setAttribute("errorMsg", "Status not updated");
