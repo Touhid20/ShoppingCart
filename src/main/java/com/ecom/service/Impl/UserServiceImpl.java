@@ -5,9 +5,17 @@ import com.ecom.repository.UserRepo;
 import com.ecom.service.UserService;
 import com.ecom.util.AppConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -73,10 +81,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean unlockAccountTimeExpired(UserDtls user) {
         long lockTime = user.getLockTime().getTime();
-        long unLockTime = lockTime+ AppConstant.UNLOCK_DURATION_TIME;
+        long unLockTime = lockTime + AppConstant.UNLOCK_DURATION_TIME;
         long currentTime = System.currentTimeMillis();
 
-        if(unLockTime<currentTime){
+        if (unLockTime < currentTime) {
             user.setAccountNonLocked(true);
             user.setFailedAttempt(0);
             user.setLockTime(null);
@@ -106,6 +114,41 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtls updateUser(UserDtls user) {
-       return userRepo.save(user);
+        return userRepo.save(user);
+    }
+
+    @Override
+    public UserDtls updateUserProfile(UserDtls user, MultipartFile img) {
+        UserDtls dbUser = userRepo.findById(user.getId()).get();
+
+        if (!img.isEmpty()) {
+            dbUser.setProfileImage(img.getOriginalFilename());
+        }
+        if (!ObjectUtils.isEmpty(dbUser)) {
+            dbUser.setName(user.getName());
+            dbUser.setMobileNumber(user.getMobileNumber());
+            dbUser.setAddress(user.getAddress());
+            dbUser.setCity(user.getCity());
+            dbUser.setState(user.getState());
+            dbUser.setPinCode(user.getPinCode());
+
+            dbUser = userRepo.save(dbUser);
+        }
+        try{
+            if (!img.isEmpty()) {
+                File saveFile = new ClassPathResource("static/img").getFile();
+
+                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator
+                        + img.getOriginalFilename());
+
+                System.out.println(path);
+                Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        return dbUser;
     }
 }
