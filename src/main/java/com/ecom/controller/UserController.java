@@ -10,6 +10,7 @@ import com.ecom.util.OrderStatus;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -38,6 +39,9 @@ public class UserController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/home")
     public String home() {
@@ -165,10 +169,32 @@ public class UserController {
     @PostMapping("/updateProfile")
     public String updateProfile(@ModelAttribute UserDtls user, @RequestParam MultipartFile img, HttpSession session) {
         UserDtls updateUserProfile = userService.updateUserProfile(user, img);
-        if(ObjectUtils.isEmpty(updateUserProfile)){
+        if (ObjectUtils.isEmpty(updateUserProfile)) {
             session.setAttribute("errorMsg", "profile not updated");
-        }else {
+        } else {
             session.setAttribute("succMsg", "profile successfully updated");
+        }
+        return "redirect:/user/profile";
+    }
+
+
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal principal, HttpSession session) {
+        UserDtls loggedInUserDetails = getLoggedInUserDetails(principal);
+        boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
+        if (matches) {
+            String encodePassword = passwordEncoder.encode(newPassword);
+            loggedInUserDetails.setPassword(encodePassword);
+            UserDtls updateUser = userService.updateUser(loggedInUserDetails);
+
+            if (ObjectUtils.isEmpty(updateUser)){
+                session.setAttribute("errorMsg", "Password not updated!! Something went wrong on server");
+            }else {
+                session.setAttribute("succMsg", "password updated successfully");
+            }
+
+        } else {
+            session.setAttribute("errorMsg", "Current password id incorrect");
         }
         return "redirect:/user/profile";
     }
