@@ -58,7 +58,7 @@ public class AdminController {
             UserDtls userDtls = userService.getUserByEmail(email);
             model.addAttribute("user", userDtls);
             Integer countCart = cartService.getCountCart(userDtls.getId());
-            model.addAttribute("countCart",countCart);
+            model.addAttribute("countCart", countCart);
 
         }
         List<Category> allActiveCategory = categoryService.getAllActiveCategory();
@@ -265,10 +265,10 @@ public class AdminController {
     @GetMapping("/updateStatus")
     public String updateUserAccountStatus(@RequestParam Boolean status, @RequestParam Integer id, HttpSession session) {
         Boolean f = userService.updateAccountStatus(id, status);
-        if(f){
-            session.setAttribute("succMsg","Account status updated");
-        }else {
-            session.setAttribute("errorMsg","Something Wrong! Try again");
+        if (f) {
+            session.setAttribute("succMsg", "Account status updated");
+        } else {
+            session.setAttribute("errorMsg", "Something Wrong! Try again");
         }
         return "redirect:/admin/users";
     }
@@ -276,7 +276,8 @@ public class AdminController {
     @GetMapping("/orders")
     public String getAllOrders(Model model) {
         List<ProductOrder> orders = orderService.getAllOrders();
-        model.addAttribute("orders",orders);
+        model.addAttribute("orders", orders);
+        model.addAttribute("search",false);
         return "/admin/orders";
     }
 
@@ -294,9 +295,9 @@ public class AdminController {
         ProductOrder updateOrder = orderService.updateStatus(id, status);
 
         try {
-            commonUtil.sendMailForProductOrder(updateOrder,status);
+            commonUtil.sendMailForProductOrder(updateOrder, status);
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
         if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("succMsg", "Status updated successfully");
@@ -304,5 +305,25 @@ public class AdminController {
             session.setAttribute("errorMsg", "Status not updated");
         }
         return "redirect:/admin/orders";
+    }
+
+    @GetMapping("/searchOrder")
+    public String searchProduct(@RequestParam String orderId, Model model,HttpSession session) {
+     if (ObjectUtils.isEmpty(orderId)){
+         List<ProductOrder> orders = orderService.getAllOrders();
+         model.addAttribute("orders", orders);
+         model.addAttribute("search",false);
+     }else {
+         ProductOrder order = orderService.getOrdersByOrderId(orderId.trim());
+         if (ObjectUtils.isEmpty(order)){
+             session.setAttribute("errorMsg", "Incorrect Order Id");
+             model.addAttribute("order",null);
+         }else {
+             model.addAttribute("order",order);
+         }
+         model.addAttribute("search",true);
+     }
+
+        return "/admin/orders";
     }
 }

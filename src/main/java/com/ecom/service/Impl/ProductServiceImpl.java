@@ -99,5 +99,10 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+    @Override
+    public List<Product> searchProduct(String text) {
+        return productRepo.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(text,text);
+    }
+
 
 }
