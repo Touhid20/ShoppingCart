@@ -21,7 +21,7 @@
                 <p class="text-danger fw-bold text-center">[[${session.errorMsg}]]</p>
                 <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
             </th:block>
-            <div class="col-md-4 p-4">
+            <div class="col-md-4 p-2">
                 <form action="/admin/searchOrder">
                     <div class="row">
                         <div class="col">
@@ -37,7 +37,7 @@
             <div class="col-md-12 ps-4 pe-4">
 
                 <table class="table table-bordered">
-                    <thead>
+                    <thead class="table-light">
                     <tr>
                         <th scope="col">Order Id</th>
                         <th scope="col">Deliver Details</th>

@@ -7,23 +7,42 @@
 </head>
 <body>
 <section>
-    <div class="container-fluid mt-5 p-5">
-        <div class="card card-sh">
-            <div class="card-header text-center">
-                <p class="fs-4">View Product</p>
-                <th:block th:if="${session.succMsg}">
-                    <p class="text-success fw-bold">[[${session.succMsg}]]</p>
-                    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
-                </th:block>
+    <div class="container-fluid mt-4 p-3">
+        <div class="row">
+            <p class="text-center fs-3 mt-2">All Products</p>
+            <hr>
+            <a href="/admin/" class="text-decoration-none"><i class="fa-solid fa-arrow-left"></i> Back</a>
 
-                <th:block th:if="${session.errorMsg}">
-                    <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
-                    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
-                </th:block>
+            <th:block th:if="${session.succMsg}">
+                <p class="text-success fw-bold">[[${session.succMsg}]]</p>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <th:block th:if="${session.errorMsg}">
+                <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <th:block th:if="${session.errorMsg}">
+                <p class="text-danger fw-bold text-center">[[${session.errorMsg}]]</p>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+            <div class="col-md-4 p-3">
+                <form action="/admin/products" method="get">
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="text">
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
+
+            <div class="p-3">
+                <table class="table table-bordered">
+                    <thead class="table-light">
                     <tr>
                         <th scope="col">Sl No</th>
                         <th scope="col">Image</th>
@@ -50,9 +69,10 @@
                         <td th:text="${p.isActive} ? 'Active' : 'Inactive'"></td>
                         <td>[[${p.stock}]]</td>
                         <td>
-                            <a th:href="@{'/admin/editProduct/'+${p.id}}" class="btn btn-sm btn-primary"> <i
-                                    class="fa-solid fa-pen-to-square fa-1x"></i> Edit</a>
-                            <a th:href="@{'/admin/deleteProduct/'+${p.id}}" class="btn btn-sm btn-danger"> <i class="fa-solid fa-trash fa-1x"></i>
+                            <a th:href="@{'/admin/editProduct/'+${p.id}}" class="btn btn-sm btn-primary">
+                                <i class="fa-solid fa-pen-to-square fa-1x"></i> Edit</a>
+                            <a th:href="@{'/admin/deleteProduct/'+${p.id}}" class="btn btn-sm btn-danger"> <i
+                                    class="fa-solid fa-trash fa-1x"></i>
                                 Delete</a>
                         </td>
                     </tr>
@@ -61,6 +81,7 @@
             </div>
         </div>
     </div>
+
 </section>
 
 </body>

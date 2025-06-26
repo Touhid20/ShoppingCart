@@ -215,8 +215,14 @@ public class AdminController {
 
 
     @GetMapping("/products")
-    public String loadViewProduct(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
+    public String loadViewProduct(Model model, @RequestParam(defaultValue = "") String text) {
+        List<Product> products = null;
+        if (!ObjectUtils.isEmpty(text)) {
+            products = productService.searchProduct(text);
+        } else {
+            products=  productService.getAllProducts();
+        }
+        model.addAttribute("products",products);
         return "/admin/products";
     }
 
@@ -277,7 +283,7 @@ public class AdminController {
     public String getAllOrders(Model model) {
         List<ProductOrder> orders = orderService.getAllOrders();
         model.addAttribute("orders", orders);
-        model.addAttribute("search",false);
+        model.addAttribute("search", false);
         return "/admin/orders";
     }
 
@@ -308,22 +314,24 @@ public class AdminController {
     }
 
     @GetMapping("/searchOrder")
-    public String searchProduct(@RequestParam String orderId, Model model,HttpSession session) {
-     if (ObjectUtils.isEmpty(orderId)){
-         List<ProductOrder> orders = orderService.getAllOrders();
-         model.addAttribute("orders", orders);
-         model.addAttribute("search",false);
-     }else {
-         ProductOrder order = orderService.getOrdersByOrderId(orderId.trim());
-         if (ObjectUtils.isEmpty(order)){
-             session.setAttribute("errorMsg", "Incorrect Order Id");
-             model.addAttribute("order",null);
-         }else {
-             model.addAttribute("order",order);
-         }
-         model.addAttribute("search",true);
-     }
+    public String searchProduct(@RequestParam String orderId, Model model, HttpSession session) {
+        if (ObjectUtils.isEmpty(orderId)) {
+            List<ProductOrder> orders = orderService.getAllOrders();
+            model.addAttribute("orders", orders);
+            model.addAttribute("search", false);
+        } else {
+            ProductOrder order = orderService.getOrdersByOrderId(orderId.trim());
+            if (ObjectUtils.isEmpty(order)) {
+                session.setAttribute("errorMsg", "Incorrect Order Id");
+                model.addAttribute("order", null);
+            } else {
+                model.addAttribute("order", order);
+            }
+            model.addAttribute("search", true);
+        }
 
         return "/admin/orders";
     }
+
+
 }
