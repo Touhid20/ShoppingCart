@@ -11,6 +11,9 @@ import com.ecom.util.CommonUtil;
 import com.ecom.util.OrderStatus;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -90,9 +93,16 @@ public class OrderServiceImpl implements OrderService {
     public List<ProductOrder> getAllOrders() {
         return productOrderRepo.findAll();
     }
+    @Override
+    public Page<ProductOrder> getAllOrdersPagination(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo,pageSize);
+        return productOrderRepo.findAll(pageable);
+    }
 
     @Override
     public ProductOrder getOrdersByOrderId(String orderId) {
         return productOrderRepo.findByOrderId(orderId);
     }
+
+
 }

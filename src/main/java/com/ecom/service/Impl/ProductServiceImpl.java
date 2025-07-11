@@ -36,6 +36,11 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllProducts() {
         return productRepo.findAll();
     }
+    @Override
+    public Page<Product> getAllProductsPagination(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return productRepo.findAll(pageable);
+    }
 
     @Override
     public Boolean deleteProduct(int id) {
@@ -98,7 +103,6 @@ public class ProductServiceImpl implements ProductService {
             products = productRepo.findByCategory(category);
         }
 
-
         return products;
     }
 
@@ -108,16 +112,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> getAllActiveProductPagination(int pageNo, int pageSize,String category) {
+    public Page<Product> searchProductPagination(int pageNo, int pageSize, String text) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return productRepo.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(text, text, pageable);
+    }
+
+
+
+
+    @Override
+    public Page<Product> getAllActiveProductPagination(int pageNo, int pageSize, String category) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
 
-        Page<Product> pageProduct =null;
+        Page<Product> pageProduct = null;
         if (ObjectUtils.isEmpty(category)) {
             pageProduct = productRepo.findByIsActiveTrue(pageable);
         } else {
-            pageProduct = productRepo.findByCategory(pageable,category);
+            pageProduct = productRepo.findByCategory(pageable, category);
         }
 
         return pageProduct;

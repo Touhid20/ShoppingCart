@@ -9,16 +9,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductRepo extends JpaRepository<Product,Integer> {
+public interface ProductRepo extends JpaRepository<Product, Integer> {
 
 
     List<Product> findByIsActiveTrue();
 
     List<Product> findByCategory(String category);
 
-    List<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String text,String text2);
+    List<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String text, String text2);
 
     Page<Product> findByIsActiveTrue(Pageable pageable);
 
-    Page<Product> findByCategory(Pageable pageable,String category);
+    Page<Product> findByCategory(Pageable pageable, String category);
+
+    Page<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String text, String text1, Pageable pageable);
 }

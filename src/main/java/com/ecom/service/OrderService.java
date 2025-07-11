@@ -3,6 +3,7 @@ package com.ecom.service;
 import com.ecom.model.OrderRequest;
 import com.ecom.model.ProductOrder;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -19,4 +20,6 @@ public interface OrderService {
     public List<ProductOrder> getAllOrders();
 
     public ProductOrder getOrdersByOrderId(String orderId);
+
+    public Page<ProductOrder> getAllOrdersPagination(int pageNo, int pageSize);
 }
