@@ -1,4 +1,5 @@
 package com.ecom.controller;
+
 import com.ecom.model.Category;
 import com.ecom.model.Product;
 import com.ecom.model.UserDtls;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,7 +61,7 @@ public class HomeController {
             UserDtls userDtls = userService.getUserByEmail(email);
             model.addAttribute("user", userDtls);
             Integer countCart = cartService.getCountCart(userDtls.getId());
-            model.addAttribute("countCart",countCart);
+            model.addAttribute("countCart", countCart);
         }
         List<Category> allActiveCategory = categoryService.getAllActiveCategory();
         model.addAttribute("categories", allActiveCategory);
@@ -82,13 +84,28 @@ public class HomeController {
     }
 
     @GetMapping("/products")
-    public String products(Model model, @RequestParam(value = "category", defaultValue = "") String category) {
+    public String products(Model model, @RequestParam(value = "category", defaultValue = "")
+                           String category, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+                           @RequestParam(name = "pageSize", defaultValue = "2") int pageSize) {
 //        System.out.println("category="+category);
         List<Category> categories = categoryService.getAllActiveCategory();
-        List<Product> products = productService.getAllActiveProducts(category);
-        model.addAttribute("categories", categories);
-        model.addAttribute("products", products);
         model.addAttribute("paramValue", category);
+        model.addAttribute("categories", categories);
+
+//        List<Product> products = productService.getAllActiveProducts(category);
+//        model.addAttribute("products", products);
+        Page<Product> page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
+        List<Product> products = page.getContent();
+        model.addAttribute("products", products);
+        model.addAttribute("productsSize", products.size());
+
+
+        model.addAttribute("pageNo", page.getNumber());
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalElements", page.getTotalElements());
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("isFirst", page.isFirst());
+        model.addAttribute("isLast", page.isLast());
         return "product";
     }
 
@@ -164,36 +181,36 @@ public class HomeController {
             model.addAttribute("errorMsg", "Your link is invalid or expired!!");
             return "message";
         }
-        model.addAttribute("token",token);
+        model.addAttribute("token", token);
         return "resetPassword";
     }
 
     // Update Password
     @PostMapping("/resetPassword")
-    public String resetPassword(@RequestParam String token, @RequestParam String password, HttpSession session,Model model) {
+    public String resetPassword(@RequestParam String token, @RequestParam String password, HttpSession session, Model model) {
         UserDtls userByToken = userService.getUserByToken(token);
         if (ObjectUtils.isEmpty(userByToken)) {
             model.addAttribute("msg", "Your link is invalid or expired!!");
             return "message";
-        }else {
+        } else {
             userByToken.setPassword(passwordEncoder.encode(password));
             userByToken.setResetToken(null);
             userService.updateUser(userByToken);
-           // session.setAttribute("succMsg","Password change successfully");
-            model.addAttribute("msg","Password change successfully");
+            // session.setAttribute("succMsg","Password change successfully");
+            model.addAttribute("msg", "Password change successfully");
             return "message";
         }
 
     }
+
     @GetMapping("/search")
-    public String searchProduct(@RequestParam String text, Model model){
+    public String searchProduct(@RequestParam String text, Model model) {
         List<Product> searchProducts = productService.searchProduct(text);
         List<Category> categories = categoryService.getAllActiveCategory();
-        model.addAttribute("products",searchProducts);
+        model.addAttribute("products", searchProducts);
         model.addAttribute("categories", categories);
         return "/product";
     }
-
 
 
 }
