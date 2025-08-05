@@ -33,6 +33,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Controller
 
@@ -71,7 +72,16 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String index() {
+    public String index(Model model) {
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory().stream()
+                .sorted((c1,c2)->c2.getId().compareTo(c1.getId()))
+                .limit(6).toList();
+        List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
+                .sorted((p1,p2)->p2.getId().compareTo(p1.getId()))
+                .limit(8).toList();
+       model.addAttribute("categories",allActiveCategory);
+       model.addAttribute("products",allActiveProducts);
+
         return "index";
     }
 
@@ -88,7 +98,7 @@ public class HomeController {
     @GetMapping("/products")
     public String products(Model model, @RequestParam(value = "category", defaultValue = "")
                            String category, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-                           @RequestParam(name = "pageSize", defaultValue = "9") int pageSize, @RequestParam(defaultValue = "") String text) {
+                           @RequestParam(name = "pageSize", defaultValue = "12") int pageSize, @RequestParam(defaultValue = "") String text) {
 
 //        System.out.println("category="+category);
         List<Category> categories = categoryService.getAllActiveCategory();

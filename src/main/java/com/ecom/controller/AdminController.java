@@ -85,7 +85,7 @@ public class AdminController {
 
     @GetMapping("/category")
     public String category(Model model, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-                           @RequestParam(name = "pageSize", defaultValue = "2") int pageSize) {
+                           @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 //        model.addAttribute("categories", categoryService.getAllCategory());
         Page<Category> page = categoryService.getAllCategoryPagination(pageNo, pageSize);
         List<Category> categories = page.getContent();
@@ -232,7 +232,7 @@ public class AdminController {
 
     @GetMapping("/products")
     public String loadViewProduct(Model model, @RequestParam(defaultValue = "") String text, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-                                  @RequestParam(name = "pageSize", defaultValue = "5") int pageSize) {
+                                  @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 //        List<Product> products = null;
 //        if (!ObjectUtils.isEmpty(text)) {
 //            products = productService.searchProduct(text);
@@ -320,7 +320,7 @@ public class AdminController {
 
     @GetMapping("/orders")
     public String getAllOrders(Model model, @RequestParam(defaultValue = "") String text, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-                               @RequestParam(name = "pageSize", defaultValue = "4") int pageSize) {
+                               @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 //        List<ProductOrder> orders = orderService.getAllOrders();
 //        model.addAttribute("orders", orders);
 //        model.addAttribute("search", false);
@@ -367,7 +367,7 @@ public class AdminController {
 
     @GetMapping("/searchOrder")
     public String searchProduct(@RequestParam String orderId, Model model, HttpSession session, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-                                @RequestParam(name = "pageSize", defaultValue = "4") int pageSize) {
+                                @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         if (ObjectUtils.isEmpty(orderId)) {
 //            List<ProductOrder> orders = orderService.getAllOrders();
 //            model.addAttribute("orders", orders);
