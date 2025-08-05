@@ -74,9 +74,11 @@ public class UserController {
         return "redirect:/product/" + pid;
     }
 
+
+
     @GetMapping("/cart")
     private String loadCartPage(Principal principal, Model model) {
-        UserDtls user = getLoggedInUserDetails(principal);
+        UserDtls user = commonUtil.getLoggedInUserDetails(principal);
         List<Cart> carts = cartService.getCartsByUser(user.getId());
         model.addAttribute("carts", carts);
         if (carts.size() > 0) {
@@ -86,11 +88,6 @@ public class UserController {
         return "/user/cart";
     }
 
-    private UserDtls getLoggedInUserDetails(Principal principal) {
-        String email = principal.getName();
-        UserDtls userDtls = userService.getUserByEmail(email);
-        return userDtls;
-    }
 
     @GetMapping("/cartQuantityUpdate")
     public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
@@ -100,7 +97,7 @@ public class UserController {
 
     @GetMapping("/orders")
     public String cardPage(Principal principal, Model model) {
-        UserDtls user = getLoggedInUserDetails(principal);
+        UserDtls user =   commonUtil.getLoggedInUserDetails(principal);
         List<Cart> carts = cartService.getCartsByUser(user.getId());
         model.addAttribute("carts", carts);
         if (carts.size() > 0) {
@@ -115,7 +112,7 @@ public class UserController {
     @PostMapping("/saveOrders")
     public String saveOrders(@ModelAttribute OrderRequest request, Principal principal) throws Exception {
 //        System.out.println(request);
-        UserDtls user = getLoggedInUserDetails(principal);
+        UserDtls user =  commonUtil.getLoggedInUserDetails(principal);
         orderService.saveOrder(user.getId(), request);
         return "redirect:/user/success";
     }
@@ -128,7 +125,7 @@ public class UserController {
 
     @GetMapping("/userOrder")
     public String userOrder(Model model, Principal principal) {
-        UserDtls loginUser = getLoggedInUserDetails(principal);
+        UserDtls loginUser =   commonUtil.getLoggedInUserDetails(principal);;
         List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
         model.addAttribute("orders", orders);
         return "/user/userOrder";
@@ -180,7 +177,7 @@ public class UserController {
 
     @PostMapping("/changePassword")
     public String changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal principal, HttpSession session) {
-        UserDtls loggedInUserDetails = getLoggedInUserDetails(principal);
+        UserDtls loggedInUserDetails =   commonUtil.getLoggedInUserDetails(principal);
         boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
         if (matches) {
             String encodePassword = passwordEncoder.encode(newPassword);

@@ -151,4 +151,17 @@ public class UserServiceImpl implements UserService {
 
         return dbUser;
     }
+
+    @Override
+    public UserDtls saveAdmin(UserDtls user) {
+        user.setRole("ROLE_ADMIN");
+        user.setIsEnable(true);
+        user.setAccountNonLocked(true);
+        user.setFailedAttempt(0);
+        user.setLockTime(null);
+        String enCodePassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(enCodePassword);
+        UserDtls saveUser = userRepo.save(user);
+        return saveUser;
+    }
 }

@@ -1,5 +1,6 @@
 package com.ecom.controller;
 
+import ch.qos.logback.core.util.StringUtil;
 import com.ecom.model.Category;
 import com.ecom.model.Product;
 import com.ecom.model.UserDtls;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,7 +88,8 @@ public class HomeController {
     @GetMapping("/products")
     public String products(Model model, @RequestParam(value = "category", defaultValue = "")
                            String category, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-                           @RequestParam(name = "pageSize", defaultValue = "9") int pageSize) {
+                           @RequestParam(name = "pageSize", defaultValue = "9") int pageSize, @RequestParam(defaultValue = "") String text) {
+
 //        System.out.println("category="+category);
         List<Category> categories = categoryService.getAllActiveCategory();
         model.addAttribute("paramValue", category);
@@ -94,7 +97,13 @@ public class HomeController {
 
 //        List<Product> products = productService.getAllActiveProducts(category);
 //        model.addAttribute("products", products);
-        Page<Product> page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
+        Page<Product> page = null;
+        if (StringUtils.isEmpty(text)) {
+            page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
+        }else {
+            page = productService.searchActiveProductPagination(pageNo, pageSize, category,text);
+        }
+
         List<Product> products = page.getContent();
         model.addAttribute("products", products);
         model.addAttribute("productsSize", products.size());
