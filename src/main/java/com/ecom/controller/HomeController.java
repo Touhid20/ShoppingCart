@@ -74,13 +74,13 @@ public class HomeController {
     @GetMapping("/")
     public String index(Model model) {
         List<Category> allActiveCategory = categoryService.getAllActiveCategory().stream()
-                .sorted((c1,c2)->c2.getId().compareTo(c1.getId()))
+                .sorted((c1, c2) -> c2.getId().compareTo(c1.getId()))
                 .limit(6).toList();
         List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
-                .sorted((p1,p2)->p2.getId().compareTo(p1.getId()))
+                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId()))
                 .limit(8).toList();
-       model.addAttribute("categories",allActiveCategory);
-       model.addAttribute("products",allActiveProducts);
+        model.addAttribute("categories", allActiveCategory);
+        model.addAttribute("products", allActiveProducts);
 
         return "index";
     }
@@ -110,8 +110,8 @@ public class HomeController {
         Page<Product> page = null;
         if (StringUtils.isEmpty(text)) {
             page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
-        }else {
-            page = productService.searchActiveProductPagination(pageNo, pageSize, category,text);
+        } else {
+            page = productService.searchActiveProductPagination(pageNo, pageSize, category, text);
         }
 
         List<Product> products = page.getContent();
@@ -139,24 +139,31 @@ public class HomeController {
     public String saveUser(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile file, HttpSession session)
             throws IOException {
 
+        Boolean existsEmail = userService.existEmail(user.getEmail());
+
         String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
         user.setProfileImage(imageName);
         UserDtls saveUser = userService.saveUser(user);
 
-        if (!ObjectUtils.isEmpty(saveUser)) {
-            if (!file.isEmpty()) {
-                File saveFile = new ClassPathResource("static/img").getFile();
-
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator
-                        + file.getOriginalFilename());
-
-                System.out.println(path);
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            }
-            session.setAttribute("succMsg", "User added successfully");
+        if (existsEmail) {
+            session.setAttribute("errorMsg", "Email already exists");
         } else {
-            session.setAttribute("errorMsg", "Something Wrong! Try again.");
+            if (!ObjectUtils.isEmpty(saveUser)) {
+                if (!file.isEmpty()) {
+                    File saveFile = new ClassPathResource("static/img").getFile();
+
+                    Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator
+                            + file.getOriginalFilename());
+
+                    System.out.println(path);
+                    Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                }
+                session.setAttribute("succMsg", "User added successfully");
+            } else {
+                session.setAttribute("errorMsg", "Something Wrong! Try again.");
+            }
         }
+
 
         return "redirect:/registration";
     }
