@@ -48,6 +48,17 @@ Frontend: Bootstrap, Thymeleaf
 
 Database: MySQL
 
-Security: Spring Security (Role-based authentication)
+🔐 Security
+
+This project uses Spring Security for:
+
+User authentication (Login, Registration)
+
+Role-based access control (Admin / User)
+
+Password encryption with BCrypt
+
+Restricting admin pages & resources
+
 
 Email Service: Spring Mail (JavaMailSender)
