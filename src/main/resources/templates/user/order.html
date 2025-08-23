@@ -8,7 +8,7 @@
 <body>
 <section>
     <div class="container mt-5 p-5">
-        <form action="/user/saveOrders" method="post">
+        <form action="/user/saveOrders" method="post" id="orders" novalidate>
             <div class="row">
                 <div class="col-md-6">
                         <div class="mb-3 row">
@@ -54,7 +54,7 @@
                                 <input type="text" name="state" required class="form-control col">
                             </div>
                             <div class="col p-1">
-                                <label class="ps-2">Pincode</label>
+                                <label class="ps-2">PinCode</label>
                                 <input type="number" name="pinCode" required class="form-control col ms-2">
                             </div>
                         </div>
